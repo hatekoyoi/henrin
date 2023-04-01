@@ -57,12 +57,10 @@ int main(int argc, char* argv[]) {
 // ascii文字変換
 void toAscii(char* ascii, int c) {
     // 改行の場合は ' '(空白)に変換
+    // ascii文字(制御文字は除く)で表せない場合は '.'に変換
     if (c == '\n') {
         ascii[0] = ' ';
-    }
-
-    // ascii文字(制御文字は除く)で表せない場合は '.'に変換
-    if (c >= 33 && c <= 126) {
+    } else if (c >= 32 && c <= 126) {
         ascii[0] = (char)c;
     } else {
         ascii[0] = '.';
