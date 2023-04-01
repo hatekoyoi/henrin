@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char toAscii(int c);
+void toAscii(char* ascii, int c);
 void toBinary(char* bin, int c);
 
 int main(int argc, char* argv[]) {
@@ -28,16 +28,24 @@ int main(int argc, char* argv[]) {
     int c;
     // ファイルから1文字ずつ読み取って表示する
     while ((c = fgetc(binary)) != EOF) {
-        // ascii文字に変換
-        char ascii;
-        ascii = toAscii(c);
+        // 行数用カウントを文字列に変換
+        char address[9];
+        sprintf(address, "%08x", count);
 
-        // 2進数に変換
+        // ascii文字に変換
+        char ascii[2];
+        toAscii(ascii, c);
+
+        // 2進数の文字列に変換
         char bin[9];
         toBinary(bin, c);
 
+        // 16進数の文字列に変換
+        char hex[3];
+        sprintf(hex, "%02x", c);
+
         // 行数: 16進数 2進数 ascii文字 と出力
-        printf("%08x: %02x %s %c\n", count, c, bin, ascii);
+        printf("%s: %s %s %s\n", address, hex, bin, ascii);
 
         // カウントアップ
         count++;
@@ -47,18 +55,19 @@ int main(int argc, char* argv[]) {
 }
 
 // ascii文字変換
-char toAscii(int c) {
+void toAscii(char* ascii, int c) {
     // 改行の場合は ' '(空白)に変換
     if (c == '\n') {
-        return ' ';
+        ascii[0] = ' ';
     }
 
-    // ascii文字で表せない場合は '.'に変換
-    if (isascii(c)) {
-        return (char)c;
+    // ascii文字(制御文字は除く)で表せない場合は '.'に変換
+    if (c >= 33 && c <= 126) {
+        ascii[0] = (char)c;
     } else {
-        return '.';
+        ascii[0] = '.';
     }
+    ascii[1] = '\0';
 }
 
 // 2進数変換
