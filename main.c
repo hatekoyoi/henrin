@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+char toAscii(int c);
+void toBinary(char* bin, int c);
+
 int main(int argc, char* argv[]) {
     // 引数が1つでなければエラーメッセージ
     if (argc != 2) {
@@ -22,30 +25,18 @@ int main(int argc, char* argv[]) {
     }
 
     int count;
-    char c;
+    int c;
     // ファイルから1文字ずつ読み取って表示する
     while ((c = fgetc(binary)) != EOF) {
-        // ascii文字で表せない場合は '.'に変換
+        // ascii文字に変換
         char ascii;
-        if (isascii(c)) {
-            ascii = c;
-        } else {
-            ascii = '.';
-        }
-
-        // 改行の場合は ' '(空白)に変換
-        if (ascii == '\n') {
-            ascii = ' ';
-        }
+        ascii = toAscii(c);
 
         // 2進数に変換
         char bin[9];
-        for (int i = 0; i < 8; i++) {
-            bin[i] = ((c >> (7 - i)) & 1) ? '1' : '0';
-        }
-        bin[8] = '\0';
+        toBinary(bin, c);
 
-        // 行数: 16進数 2進数  ascii文字 と出力
+        // 行数: 16進数 2進数 ascii文字 と出力
         printf("%08x: %02x %s %c\n", count, c, bin, ascii);
 
         // カウントアップ
@@ -53,4 +44,32 @@ int main(int argc, char* argv[]) {
     }
 
     fclose(binary);
+}
+
+// ascii文字変換
+char toAscii(int c) {
+    // 改行の場合は ' '(空白)に変換
+    if (c == '\n') {
+        return ' ';
+    }
+
+    // ascii文字で表せない場合は '.'に変換
+    if (isascii(c)) {
+        return (char)c;
+    } else {
+        return '.';
+    }
+}
+
+// 2進数変換
+void toBinary(char* bin, int c) {
+    if (sizeof(bin) != 8) {
+        printf("sizeof(bin): %ld", sizeof(bin));
+        printf("toBinary failed\n");
+        exit(1);
+    }
+    for (int i = 7; i >= 0; i--) {
+        bin[7 - i] = (c & (1 << i)) ? '1' : '0';
+    }
+    bin[8] = '\0';
 }
